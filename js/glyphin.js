@@ -60,52 +60,13 @@
     };
     this.getGlyphs               = function(){
       return glyphs
-    }
+    };
     this.getCharacter            = function(){
       return String.fromCharCode(glyph.unicode)
     }
     this.convertCommands         = function(commands,width){
-      return isArray(commands)?convertCommands(commands,width):null
+      return isArray(commands)?convertCommands(commands,width,calibrate,getCoord):null
     };
-    function convertCommands(commands,width){
-      var len                    = commands.length-1,
-          ix                     = -1,
-          paths                  = [],
-          path                   = [[],[]],
-          lastX                  = NaN,
-          lastY                  = NaN,
-          zero                   = 0.001;
-      paths.width                = calibrate(width);
-      while(len>ix++){
-        let command              = commands[ix],
-            type                 = command.type;
-        if(endPathType(type)){
-          path.pip               = new PiP(path[1]);
-          paths.push(path);
-          path                   = [[],[]];
-          lastX                  = NaN;
-          lastY                  = NaN
-        }
-        if(moveType(type)||lineType(type)||qCurveType(type)||cCurveType(type)){
-          extendPath(getCoord(command))
-        }
-      }
-      return paths;
-
-      function extendPath(coord){
-        var thisX,thisY;
-        if(coord.length){
-          thisX                  = coord[coord.length-2],
-          thisY                  = coord[coord.length-1];
-          if ( !( coord.length === 2 && thisX<lastX+zero && thisX>lastX-zero && thisY<lastY+zero && thisY>lastY-zero ) ) {
-            lastX                = thisX;
-            lastY                = thisY;
-            path[0].push(coord);
-            path[1].push([thisX,thisY])
-          }
-        }
-      }
-    }
   };
 
   proto.getMeshWriterSeries      = function(compr){
@@ -221,71 +182,106 @@
     }
   };
 
+  const preLabel    = "      ";
+  const one         = " ";
+  const two         = "  ";
+  const four        = "    ";
+  const postLabel   = "        ";
+  const postShape   = "      ";
+  const postHole    = "       ";
+  const lf          = "\n";
+  const colon       = ": ";
+  const equals      = "= ";
+  const comma       = ",";
+  const openSquare  = "[";
+  const closeSquare = "]";
+  const openCurly   = "{";
+  const closeCurly  = "};";
+  const noLabel     = "         ";
+
   proto.formatObject             = function(glyphObj,compressed){
-    let preLabel    = "      ";
-    let one         = " ";
-    let two         = "  ";
-    let four        = "    ";
-    let postLabel   = "        ";
-    let postShape   = "      ";
-    let postHole    = "       ";
-    let lf          = "\n";
-    let colon       = ": ";
-    let equals      = "= ";
-    let comma       = ",";
     if(glyphObj.holeCmds){
-      return preLabel+'font["'+this.getCharacter()+'"]'+postLabel+equals+"{"+lf+
-             preLabel+two+"shapeCmds"+postShape+colon+"["+lf+
-             stringifyShapeCmds(glyphObj.shapeCmds)+
-             preLabel + "         " + postLabel + two + "]" +lf+
-             preLabel+two+"holeCmds"+postHole+colon+"["+lf+
-             stringifyHoleCmds(glyphObj.holeCmds)+
-             preLabel + "         " + postLabel + two + "]" +lf+
+      return preLabel+'font["'+this.getCharacter()+'"]'+postLabel+equals+openCurly+lf+
+             preLabel+two+"shapeCmds"+postShape+colon+openSquare+lf+
+             stringifyCmds(glyphObj.shapeCmds)+
+             preLabel + noLabel + postLabel + two + closeSquare +lf+
+             preLabel+two+"holeCmds"+postHole+colon+openSquare+lf+
+             stringifyCmds(glyphObj.holeCmds)+
+             preLabel + noLabel + postLabel + two + closeSquare +lf+
              preLabel+two+"xMin"+four+postHole+colon+glyphObj.xMin+comma+lf+
              preLabel+two+"xMax"+four+postHole+colon+glyphObj.xMax+comma+lf+
              preLabel+two+"yMin"+four+postHole+colon+glyphObj.yMin+comma+lf+
              preLabel+two+"yMax"+four+postHole+colon+glyphObj.yMax+comma+lf+
              preLabel+two+"width"+two+one+postHole+colon+glyphObj.width+lf+
-             preLabel+"};"+lf
+             preLabel+closeCurly+lf
     }else{
-      return preLabel+'font["'+this.getCharacter()+'"]'+postLabel+equals+"{"+lf+
-             preLabel+two+"shapeCmds"+postShape+colon+JSON.stringify(glyphObj.shapeCmds)+comma+lf+
+      return preLabel+'font["'+this.getCharacter()+'"]'+postLabel+equals+openCurly+lf+
+             preLabel+two+"shapeCmds"+postShape+colon+openSquare+lf+
+             stringifyCmds(glyphObj.shapeCmds)+
+             preLabel + noLabel + postLabel + two + closeSquare +lf+
              preLabel+two+"xMin"+four+postHole+colon+glyphObj.xMin+comma+lf+
              preLabel+two+"xMax"+four+postHole+colon+glyphObj.xMax+comma+lf+
              preLabel+two+"yMin"+four+postHole+colon+glyphObj.yMin+comma+lf+
              preLabel+two+"yMax"+four+postHole+colon+glyphObj.yMax+comma+lf+
              preLabel+two+"width"+two+one+postHole+colon+glyphObj.width+lf+
-             preLabel+"};"+lf
+             preLabel+closeCurly+lf
     }
 
-    function stringifyShapeCmds(cmds){
+    function stringifyCmds(cmds){
       var result = "";
       for(let i=0;i<cmds.length;i++){
         if(i===cmds.length-1){
-          result = result + preLabel + "         " + postLabel + four + JSON.stringify(cmds[i]) + lf
+          result = result + preLabel + noLabel + postLabel + four + JSON.stringify(cmds[i]) + lf
         }else{
-          result = result + preLabel + "         " + postLabel + four + JSON.stringify(cmds[i])+comma + lf 
-        }
-      }
-      return result
-    }
-    function stringifyHoleCmds(cmds){
-      var result = "";
-      for(let i=0;i<cmds.length;i++){
-        if(i===cmds.length-1){
-          result = result + preLabel + "         " + postLabel + four + JSON.stringify(cmds[i]) + lf
-        }else{
-          result = result + preLabel + "         " + postLabel + four + JSON.stringify(cmds[i])+comma + lf 
+          result = result + preLabel + noLabel + postLabel + four + JSON.stringify(cmds[i])+comma + lf 
         }
       }
       return result
     }
   };
 
-
   return Glyphin;
 
 
+  function convertCommands(commands,width,calibrate,getCoord){
+    var len                    = commands.length-1,
+        ix                     = -1,
+        paths                  = [],
+        path                   = [[],[]],
+        lastX                  = NaN,
+        lastY                  = NaN,
+        zero                   = 0.001;
+    paths.width                = calibrate(width);
+    while(len>ix++){
+      let command              = commands[ix],
+          type                 = command.type;
+      if(endPathType(type)){
+        path.pip               = new PiP(path[1]);
+        paths.push(path);
+        path                   = [[],[]];
+        lastX                  = NaN;
+        lastY                  = NaN
+      }
+      if(moveType(type)||lineType(type)||qCurveType(type)||cCurveType(type)){
+        extendPath(getCoord(command))
+      }
+    }
+    return paths;
+
+    function extendPath(coord){
+      var thisX,thisY;
+      if(coord.length){
+        thisX                  = coord[coord.length-2],
+        thisY                  = coord[coord.length-1];
+        if ( !( coord.length===2 && thisX<lastX+zero && thisX>lastX-zero && thisY<lastY+zero && thisY>lastY-zero ) ) {
+          lastX                = thisX;
+          lastY                = thisY;
+          path[0].push(coord);
+          path[1].push([thisX,thisY])
+        }
+      }
+    }
+  };
 
   function contains(a,b){
     var i      = -1,
@@ -296,67 +292,8 @@
     }
     return c>l/2
   };
-          lastY                  = NaN,
-          zero                   = 0.001;
-  var testitalicPercent          = {
-          shapeCmds              : [
-                                     [[214,370],[151,370,108,404.5],[65,439,51.5,476],[38,513,38,545],[38,622,90.5,671],[143,720,214,720],[290,720,340,668.5],[390,617,390,545],[390,481,355,439],[320,397,283,383.5],[246,370,214,370]],
-                                     [[667,712],[217,-31],[165,-4],[616,739],[667,712]],
-                                     [[619,-12],[556,-12,513,22.5],[470,57,456.5,94],[443,131,443,163],[443,227,478,269],[513,311,550,324.5],[587,338,619,338],[682,338,725,303.5],[768,269,781.5,232],[795,195,795,163],[795,99,760,57],[725,15,688,1.5],[651,-12,619,-12]]
-                                   ],
-          holeCmds               : [
-                                      [
-                                         [[214,430],[264,430,297,464.5],[330,499,330,545],[330,595,295.5,627.5],[261,660,214,660],[164,660,131,625.5],[98,591,98,545],[98,495,132.5,462.5],[167,430,214,430]]
-                                      ],
-                                      [],
-                                      [
-                                         [[619,48],[669,48,702,82.5],[735,117,735,163],[735,213,700.5,245.5],[666,278,619,278],[569,278,536,243.5],[503,209,503,163],[503,113,537.5,80.5],[572,48,619,48]]
-                                      ]
-                                   ]
-  };
-  var testitalicB                = {
-          shapeCmds              : [
-                                     [[304,0],[94,0],[94,708],[305,708],[415,708,474,660],[533,612,533,527],[533,471,499,429.5],[465,388,408,375],[408,373],[477,365,522.5,319.5],[568,274,568,196],[568,105,496,52.5],[424,0,304,0]]
-                                   ],
-          holeCmds               : [
-                                      [
-                                         [[166,339],[166,62],[300,62],[398,62,446.5,100.5],[495,139,495,200],[495,270,447.5,304.5],[400,339,313,339],[166,339]],
-                                         [[166,646],[166,398],[311,398],[382,398,421.5,431.5],[461,465,461,522],[461,583,416,614.5],[371,646,291,646],[166,646]]
-                                      ]
-                                   ]
-  };
-  var textChinese9300            = {
-    shapeCmds                    : [
-                                      [[567,-22],[622,7],[663,-46.5,694,-96.5],[633.5,-128.5],[606,-78,567,-22]],
-                                      [[320,-17.5],[378.5,7],[414,-50.5,440,-104.5],[375.5,-131.5],[353.5,-77,320,-17.5]],
-                                      [[831,-17.5],[883.5,18],[934.5,-38,976.5,-93.5],[918.5,-134.5],[882.5,-78,831,-17.5]],
-                                      [[131.5,20.5],[188,-13.5],[140.5,-80,87.5,-139.5],[34,-97.5],[87.5,-43.5,131.5,20.5]],
-                                      [[625.5,526.5],[625.5,762],[696,762],[696,526.5],[625.5,526.5]],
-                                      [[835.5,812],[906,812],[906,511],[905,423,811.5,421],[754.5,419,670.5,421],[665,455.5,657,490.5],[739,485.5,783,485.5],[835.5,485.5,835.5,537.5],[835.5,812]],
-                                      [[67,263],[218.5,327.5,322,411.5],[273,411.5],[273,553],[192,472,69,408.5],[46.5,436,23,463],[166,524.5,253.5,605.5],[56.5,605.5],[56.5,661.5],[273,661.5],[273,729.5],[180.5,726,88.5,723],[86.5,730.5,76,777.5],[312,784.5,517.5,799],[529,743.5],[434.5,737.5,341.5,732.5],[341.5,661.5],[551.5,661.5],[551.5,605.5],[341.5,605.5],[341.5,561],[372,591],[459.5,548,547.5,502],[508.5,452.5],[428.5,497.5,341.5,543],[341.5,427],[357,441.5,373,456.5],[456,456.5],[431.5,430,405,405.5],[728.5,405.5],[728.5,358.5],[673.5,297],[856,297],[856,20],[161,20],[161,235.5],[135.5,223,110,210],[90.5,238.5,67,263]]
-                                   ],
-    holeCmds                     : [
-                                      [],
-                                      [],
-                                      [],
-                                      [],
-                                      [],
-                                      [],
-                                      [
-                                         [[226.5,134],[226.5,70.5],[475.5,70.5],[475.5,134],[226.5,134]],
-                                         [[790,183],[790,246.5],[541,246.5],[541,183],[790,183]],
-                                         [[541,70.5],[790,70.5],[790,134],[541,134],[541,70.5]],
-                                         [[226.5,246.5],[226.5,183],[475.5,183],[475.5,246.5],[226.5,246.5]],
-                                         [[596.5,297],[646,356.5],[347.5,356.5],[309.5,325.5,264.5,297],[596.5,297]]
-                                      ]
-                                   ],
-    xMin                         : 23,
-    xMax                         : 976.5,
-    yMin                         : -139.5,
-    yMax                         : 812,
-    width                        : 999.5
-  };
-  foo="https://www.babylonjs-playground.com/#NLG6KE";
+
+  //  ~  -  =  ~  -  =  ~  -  =  ~  -  =  ~  -  =  ~  -  =  
   function makeGetCoord(calibrate){
     return function getCoord(cmd){
       if ( typeof cmd.x2 === "number" ) {
@@ -374,10 +311,13 @@
       }
     }
   };
+
+  //  ~  -  =  ~  -  =  ~  -  =  ~  -  =  ~  -  =  ~  -  =  
+  // All fonts are calibrated to 1000 unts per em
   function makeCalibrate(unitsPerEm){
     var floor                    = Math.floor,
         factor                   = floor( 0.01 + 1000000000 / unitsPerEm ) / 500000;
-    console.log("Factor = "+factor);
+    console.log("Calibration factor = "+factor);
     return function calibrate(n){
       return Math.floor(0.000001+n*factor)/2
     }
