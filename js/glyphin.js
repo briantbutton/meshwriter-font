@@ -7,6 +7,7 @@
 
   const root                     = this || {} ;
   const proto                    = Glyphin.prototype;
+  var codeList;
 
   if ( typeof module === 'object' && module.exports ) {
     module.exports               = Glyphin;
@@ -29,6 +30,7 @@
         allGlyphs                = font.glyphs.glyphs,
         l                        = font.glyphs.length-1;
 
+    codeList                     = MeshWriter().codeList;
     series.forEach(function(letter,ix){
       var i                      = -1;
       if ( typeof letter === "string" ) {
@@ -134,7 +136,7 @@
     var converted                = conv.slice(),
         reference                = conv.slice(),
         commandsArray            = [],
-        holesArray               = []
+        holesArray               = [],
         maxIterations            = 16,
         result                   = [[],[]];
     result.width                 = conv.width;
@@ -200,14 +202,15 @@
   const noLabel     = "         ";
 
   proto.formatObject             = function(glyphObj,compressed){
+    var quote                    = this.getCharacter().charCodeAt(0)===34?"'":'"';
     if(glyphObj.holeCmds){
-      return preLabel+'font["'+this.getCharacter()+'"]'+postLabel+equals+openCurly+lf+
-             preLabel+two+"shapeCmds"+postShape+colon+openSquare+lf+
-             stringifyCmds(glyphObj.shapeCmds)+
-             preLabel + noLabel + postLabel + two + closeSquare +lf+
-             preLabel+two+"holeCmds"+postHole+colon+openSquare+lf+
-             stringifyCmds(glyphObj.holeCmds)+
-             preLabel + noLabel + postLabel + two + closeSquare +lf+
+      return preLabel+'font['+quote+this.getCharacter()+quote+']'+postLabel+equals+openCurly+lf+
+             preLabel+two+(compressed?"sC       ":"shapeCmds")+postShape+colon+openSquare+lf+
+             stringifyShapeCmds(glyphObj.shapeCmds)+
+             preLabel+noLabel+postLabel+two+closeSquare+comma+lf+
+             preLabel+two+(compressed?"hC      ":"holeCmds")+postHole+colon+openSquare+lf+
+             stringifyHoleCmds(glyphObj.holeCmds)+
+             preLabel+noLabel+postLabel+two+closeSquare+comma+lf+
              preLabel+two+"xMin"+four+postHole+colon+glyphObj.xMin+comma+lf+
              preLabel+two+"xMax"+four+postHole+colon+glyphObj.xMax+comma+lf+
              preLabel+two+"yMin"+four+postHole+colon+glyphObj.yMin+comma+lf+
@@ -215,10 +218,10 @@
              preLabel+two+"width"+two+one+postHole+colon+glyphObj.width+lf+
              preLabel+closeCurly+lf
     }else{
-      return preLabel+'font["'+this.getCharacter()+'"]'+postLabel+equals+openCurly+lf+
-             preLabel+two+"shapeCmds"+postShape+colon+openSquare+lf+
-             stringifyCmds(glyphObj.shapeCmds)+
-             preLabel + noLabel + postLabel + two + closeSquare +lf+
+      return preLabel+'font['+quote+this.getCharacter()+quote+']'+postLabel+equals+openCurly+lf+
+             preLabel+two+(compressed?"sC       ":"shapeCmds")+postShape+colon+openSquare+lf+
+             stringifyShapeCmds(glyphObj.shapeCmds)+
+             preLabel+noLabel+postLabel+two+closeSquare+comma+lf+
              preLabel+two+"xMin"+four+postHole+colon+glyphObj.xMin+comma+lf+
              preLabel+two+"xMax"+four+postHole+colon+glyphObj.xMax+comma+lf+
              preLabel+two+"yMin"+four+postHole+colon+glyphObj.yMin+comma+lf+
@@ -227,16 +230,42 @@
              preLabel+closeCurly+lf
     }
 
-    function stringifyCmds(cmds){
-      var result = "";
+    function stringifyShapeCmds(cmds){
+      var result  = ""
+          convert = compressed ? function(x){return "'"+codeList(x)+"'"} : JSON.stringify;
       for(let i=0;i<cmds.length;i++){
         if(i===cmds.length-1){
-          result = result + preLabel + noLabel + postLabel + four + JSON.stringify(cmds[i]) + lf
+          result = result + preLabel + noLabel + postLabel + four + convert(cmds[i]) + lf
         }else{
-          result = result + preLabel + noLabel + postLabel + four + JSON.stringify(cmds[i])+comma + lf 
+          result = result + preLabel + noLabel + postLabel + four + convert(cmds[i])+comma + lf 
         }
       }
       return result
+    }
+
+    function stringifyHoleCmds(cmds){
+      var result   = ""
+          convert  = compressed ? function(x){return "'"+codeList(x)+"'"} : JSON.stringify;
+      for(let i=0;i<cmds.length;i++){
+        if(i===cmds.length-1){
+          result = result + preLabel + noLabel + postLabel + four + openSquare + superconvert(cmds[i]) + closeSquare + lf
+        }else{
+          result = result + preLabel + noLabel + postLabel + four + openSquare + superconvert(cmds[i]) + closeSquare + comma + lf 
+        }
+      }
+      return result;
+
+      function superconvert(cmds){
+        var result = "";
+        for(let i=0;i<cmds.length;i++){
+          if(i===cmds.length-1){
+            result = result+convert(cmds[i])
+          }else{
+            result = result+convert(cmds[i])+comma
+          }
+        }
+        return result
+      }
     }
   };
 
