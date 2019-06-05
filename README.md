@@ -8,31 +8,48 @@ Contact the author for more information.
 
 ## Dependencies
 
-MeshWriter-Font requires npm and webpack.&nbsp;
+Converting new font with MeshWriter-Font requires **nodejs**.&nbsp;
+Making a new minified build of MeshWriter with custom font collections also requires **npm** and **webpack**.&nbsp;
 (Note to reader:  If you notice undocumented dependencies, let me know.)&nbsp;
 
 ## Recipe
 
 Here is how the author builds a new font.&nbsp;
 
-	Download the MeshWriter repo and the MeshWriter-Font repo on your machine
-	Follow this directory structure and naming
-	ParentDir
-	  + meshwriter
-	    + fonts
-	    + earcut
-	  + meshwriter-font
-	    + fonts                        // Place .ttf and .otf files here
-	    + opentype
-	    + js
+### Set up
 
-	Place your font file 'FooBar.ttf' in meshwriter-font/fonts
-	Then in meshwriter-font, start node
+Download the MeshWriter repo and MeshWriter-Font repo side by side onto your dev machine.
+
+	Follow this directory structure and naming
+	(Note that both directories use lowercase letter.  Naming matters here.)
+
+	ParentDir
+	   |
+	   + - - meshwriter
+	   |   + - fonts                        // MeshWriter font files will be written here
+	   |   + - earcut
+	   |
+	   + - - meshwriter-font
+	       + - fonts                        // You will be placing .ttf/.otf files here
+	       + - opentype
+	       + - js
+
+All done with setup.
+
+### Convert a file
+
+Place a font file, hypothetically called 'FooBar-Book.ttf', into /meshwriter-font/fonts.&nbsp;
+
+From /meshwriter-font, invoke node:
+
 	> require("./index")
+	{}
 	> convertFontFile({suffix:"ttf",name:"FooBar",compress:true})
 
-	They should be 'sibling' directories, in the same parent directory
-	Both directory names should be in lower-case
-	$ copy the 
-	$ cd meshwrit
+That's it!  
+
+### Packaging MeshWriter with your new fonts
+
+At this point, the action returns to the /meshwriter directory.&nbsp;
+The instructions for making a new build are in /meshwriter/fonts/README.md.
 
