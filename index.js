@@ -54,7 +54,7 @@
         }
         fileText               = filePre(fontName,nativeFont.outlinesFormat)+fileText+filePost(fontName);
         const fileBuffer       = Buffer.from(fileText);
-        fs.writeFile(config.relPathTo+name+"."+"js",fileBuffer,onWriteFile)
+        fs.writeFile(config.relPathTo+name.toLowerCase()+"."+"js",fileBuffer,onWriteFile)
       }
     };
     function onWriteFile(err){
