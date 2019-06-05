@@ -1,10 +1,7 @@
 # MeshWriter-Font
 
 Generate fonts for BABYLON MeshWriter.&nbsp;
-https://github.com/briantbutton/meshwriter
-
-This repo is still "pre-release".&nbsp;
-Contact the author for more information.
+(https://github.com/briantbutton/meshwriter)
 
 ## Dependencies
 
@@ -44,7 +41,9 @@ From /meshwriter-font, invoke node:
 
 	> require("./index")
 	{}
-	> convertFontFile({suffix:"ttf",name:"FooBar",compress:true})
+	> convertFontFile({suffix:"ttf",name:"FooBar-Book",compress:true})
+	undefined
+	Wrote MeshWriter font file to '../meshwriter/fonts/firasansot-medium.js'
 
 That's it!  
 

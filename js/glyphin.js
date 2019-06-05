@@ -19,6 +19,9 @@
     }
   }
 
+  // *-*=*  *=*-* *-*=*  *=*-* *-*=*  *=*-* *-*=*  *=*-* *-*=*  *=*-* *-*=*  *=*-*
+  // The constructor
+
   function Glyphin(font,ser){
 
     var glyphin                  = this,
@@ -346,7 +349,7 @@
   function makeCalibrate(unitsPerEm){
     var floor                    = Math.floor,
         factor                   = floor( 0.01 + 1000000000 / unitsPerEm ) / 500000;
-    console.log("Calibration factor = "+factor);
+    // console.log("Calibration factor = "+factor);
     return function calibrate(n){
       return Math.floor(0.000001+n*factor)/2
     }

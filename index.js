@@ -16,9 +16,7 @@
   global.PiP                     = PiP;
 
   // *-*=*  *=*-* *-*=*  *=*-* *-*=*  *=*-* *-*=*  *=*-* *-*=*  *=*-* *-*=*  *=*-*
-  // This function loads the specific type-faces and returns the superconstructor
-  // If BABYLON is loaded, it assigns the superconstructor to BABYLON.MeshWriter
-  // Otherwise it assigns it to global variable 'BABYLONTYPE'
+  // The command function
 
   global.convertFontFile         = function(opt){
     const options                = opt && typeof opt === "object" ? opt : {};
@@ -62,7 +60,7 @@
         console.log("Could not write to '"+config.relPathTo+name+"."+"js"+"'");
         console.log(err)
       }else{
-        console.log("Wrote MeshWriter font file to '"+"./"+dir+subdir+name+"."+"js"+"'")
+        console.log("Wrote MeshWriter font file to '"+config.relPathTo+name.toLowerCase()+"."+"js"+"'")
       }
     }
   };
