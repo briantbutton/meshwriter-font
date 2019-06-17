@@ -50,5 +50,5 @@ That's it!
 ### Packaging MeshWriter with your new fonts
 
 At this point, the action returns to the /meshwriter directory.&nbsp;
-The instructions for making a new build are in /meshwriter/fonts/README.md.
+The instructions for making a new build are found here:  https://github.com/briantbutton/meshwriter/tree/master/fonts
 
