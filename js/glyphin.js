@@ -218,7 +218,7 @@
              preLabel+two+"xMax"+four+postHole+colon+glyphObj.xMax+comma+lf+
              preLabel+two+"yMin"+four+postHole+colon+glyphObj.yMin+comma+lf+
              preLabel+two+"yMax"+four+postHole+colon+glyphObj.yMax+comma+lf+
-             preLabel+two+"width"+two+one+postHole+colon+glyphObj.width+lf+
+             preLabel+two+"wdth"+four+postHole+colon+glyphObj.width+lf+
              preLabel+closeCurly+lf
     }else{
       return preLabel+'font['+quote+this.getCharacter()+quote+']'+postLabel+equals+openCurly+lf+
@@ -229,7 +229,7 @@
              preLabel+two+"xMax"+four+postHole+colon+glyphObj.xMax+comma+lf+
              preLabel+two+"yMin"+four+postHole+colon+glyphObj.yMin+comma+lf+
              preLabel+two+"yMax"+four+postHole+colon+glyphObj.yMax+comma+lf+
-             preLabel+two+"width"+two+one+postHole+colon+glyphObj.width+lf+
+             preLabel+two+"wdth"+four+postHole+colon+glyphObj.width+lf+
              preLabel+closeCurly+lf
     }
 

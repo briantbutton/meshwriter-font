@@ -35,15 +35,15 @@ All done with setup.
 
 ### Convert a file
 
-Place a font file, hypothetically called 'FooBar-Book.ttf', into /meshwriter-font/fonts.&nbsp;
+Place a font file, hypothetically called 'FooBar-Book.ttf', into /meshwriter/fonts.&nbsp;
 
-From /meshwriter-font, invoke node:
+From /meshwriter-font, invoke **node**:
 
 	> require("./index")
 	{}
 	> convertFontFile({suffix:"ttf",name:"FooBar-Book",compress:true})
 	undefined
-	Wrote MeshWriter font file to '../meshwriter/fonts/firasansot-medium.js'
+	Wrote MeshWriter font file to '../meshwriter/fonts/foobar-book.js'
 
 That's it!  
 
