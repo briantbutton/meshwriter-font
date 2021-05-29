@@ -13,12 +13,12 @@ Making a new minified build of MeshWriter with custom font collections also requ
 
 Here is how the author builds a new font.&nbsp;
 
-### Set up
+### Set up directories
 
 Download the MeshWriter repo and MeshWriter-Font repo side by side onto your dev machine.
 
 	Follow this directory structure and naming
-	(Note that both directories use lowercase letter.  Naming matters here.)
+	(Note that both directories use lowercase letters.  Naming matters.)
 
 	ParentDir
 	   |
@@ -33,15 +33,34 @@ Download the MeshWriter repo and MeshWriter-Font repo side by side onto your dev
 
 All done with setup.
 
-### Convert a file
+### Place new font files
 
 Place a font file, hypothetically called 'FooBar-Book.ttf', into /meshwriter/fonts.&nbsp;
 
-From /meshwriter-font, invoke **node**:
+### Select glyph coverage
+
+Open config.js.&nbsp;
+Do you like the default-coverage list?&nbsp;
+If so, you are done.&nbsp;
+Otherwise, put coverage for your font into config.js.&nbsp;
+Like this:
+
+	"foobar-book"   : [	
+	  "a","b","c","A","B","C","1","2","3"
+	],
+
+### Start node, load meshwriter-font and run it
+
+From the directory, /meshwriter-font, invoke **node**:
 
 	> require("./index")
 	{}
 	> convertFontFile({suffix:"ttf",name:"FooBar-Book",compress:true})
+	[ 
+	  'a', 'b', 'c',
+	  'A', 'B', 'C',
+	  '1', '2', '3'
+	]
 	undefined
 	Wrote MeshWriter font file to '../meshwriter/fonts/foobar-book.js'
 
