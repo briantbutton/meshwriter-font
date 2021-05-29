@@ -14,6 +14,7 @@
   const root                     = this;
 
   global.PiP                     = PiP;
+  global.config_                 = config;
 
   // *-*=*  *=*-* *-*=*  *=*-* *-*=*  *=*-* *-*=*  *=*-* *-*=*  *=*-* *-*=*  *=*-*
   // The command function
@@ -27,7 +28,17 @@
     const compress               = opt.compress === true;
     const subdir                 = typeof  sd === "string" &&  sd.length>1 ?  sd+"/" : "";
     const dir                    = typeof  dd === "string" &&  dd.length>1 ?  dd+"/" : "";
-    const coverage               = typeof config.coverage === "object" ? config.coverage : ["0","1","2","3","4","5","6","7","8","9"];
+    const coverage               = typeof name === "string" ?
+                                          typeof config[name.toLowerCase()] === "object" ? 
+                                                config[name.toLowerCase()]
+                                              : typeof config["default-coverage"] === "object" ?
+                                                      config["default-coverage"]
+                                                    : ["0","1","2","3","4","5","6","7","8","9"]
+                                        : typeof config["default-coverage"] === "object" ?
+                                                config["default-coverage"]
+                                              : ["0","1","2","3","4","5","6","7","8","9"];
+
+    console.log(coverage);
 
     if(!arguments.length){
       return "arguments:  suffix , filename [ directory [ subdirectory ] ] "
