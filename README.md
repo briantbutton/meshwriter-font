@@ -35,7 +35,7 @@ All done with setup.
 
 ### Place new font files
 
-Place a font file, hypothetically called 'FooBar-Book.ttf', into /meshwriter/fonts.&nbsp;
+Place a font file, hypothetically called 'FooBar-Book.ttf', into /meshwriter-font/fonts.&nbsp;
 
 ### Select glyph coverage
 
